@@ -1,10 +1,12 @@
-__pycache__/
+__pycache__
 *.pyc
 *.pyo
 *.pyd
+*.swp
+*.swo
 .Python
 .env
+.venv
 .git
 .gitignore
 .DS_Store
-.vscode
