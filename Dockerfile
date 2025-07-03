@@ -1,26 +1,19 @@
-# Use official Python image
-FROM python:3.8.10
+FROM python:3.10-slim
 
-# Install system dependencies needed by mediapipe and others
+# Install system libs for mediapipe & opencv
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    libsm6 \
-    libxext6 \
-    libgl1 \
-    && rm -rf /var/lib/apt/lists/*
+    ffmpeg libsm6 libxext6 libgl1 \
+ && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
 WORKDIR /app
 
-# Copy project files into the container
 COPY . .
 
-# Install Python dependencies
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose the port your app will run on (Render sets PORT env var)
-EXPOSE 10000
+# Cloud Run uses PORT env var
+EXPOSE 8080
 
-# Run the app with gunicorn
-CMD ["gunicorn", "-b", "0.0.0.0:10000", "app:app"]
+# Increase gunicorn timeout to avoid startup kill
+CMD exec gunicorn --bind :$PORT --timeout 120 app:app
